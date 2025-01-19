@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: CI
 
 on:
   push:
@@ -7,40 +7,18 @@ on:
   pull_request:
 
 jobs:
-  MarkdownLint:
-    name: MarkdownLint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Project
-        uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # tag=v3
-        with:
-          submodules: true
-      - name: Use Node.js v16
-        uses: actions/setup-node@9ced9a43a244f3ac94f13bfd896db8c8f30da67a # tag=v3
-        with:
-          node-version: 16
-          cache: yarn
-          registry-url: https://registry.npmjs.org/
-      - name: Install Dependencies
-        run: yarn --immutable
-      - name: Run MarkdownLint
-        run: yarn lint:no-fix
+  formatting:
+    name: Formatting
+    uses: sapphiredev/.github/.github/workflows/reusable-prettier.yml@main
 
-  Prettier:
-    name: Prettier Validation
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Project
-        uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # tag=v3
-        with:
-          submodules: true
-      - name: Use Node.js v16
-        uses: actions/setup-node@9ced9a43a244f3ac94f13bfd896db8c8f30da67a # tag=v3
-        with:
-          node-version: 16
-          cache: yarn
-          registry-url: https://registry.npmjs.org/
-      - name: Install Dependencies
-        run: yarn --immutable
-      - name: Run Prettier
-        run: yarn format:check
+  markdownlint:
+    name: MarkdownLint
+    uses: sapphiredev/.github/.github/workflows/reusable-yarn-job.yml@main
+    with:
+      script-name: lint:no-fix
+
+  sonar:
+    name: Sonar Analysis
+    uses: sapphiredev/.github/.github/workflows/reusable-sonar.yml@main
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
